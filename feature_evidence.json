@@ -1,0 +1,42 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-fix-the-gps-capture-bug-in-the-asset-entry-form-assetentryform-tsx-so-that-latitude-longitude-and-accuracy-are-correctly-captured-and-attached-to-new-asset-submissions-the-usegeolocation-hook-s-capture-callback-must-be-invoked-at-the-right-lifecycle-point-its-state-must-be-read-after-the-async-capture-resolves-and-the-resulting-coordinates-must-be-included-in-the-submission-payload-sent-to-the-backend",
+      "featureTitle": "Fix the GPS capture bug in the asset entry form (AssetEntryForm.tsx) so that latitude, longitude, and accuracy are correctly captured and attached to new asset submissions. The useGeolocation hook's `capture` callback must be invoked at the right lifecycle point, its state must be read after the async capture resolves, and the resulting coordinates must be included in the submission payload sent to the backend.",
+      "files": [
+        "frontend/src/components/AssetEntryForm.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-13"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-delete-asset-capability-to-the-frontend-in-the-admin-dashboard-admindashboard-tsx-add-a-delete-action-for-each-asset-record-accessible-from-the-asset-detail-drawer-and-or-the-asset-table-row-clicking-delete-shows-a-confirmation-dialog-before-calling-the-backend-deleteasset-function-on-success-the-asset-list-is-refreshed-and-a-success-toast-is-shown-on-failure-an-error-toast-is-shown",
+      "featureTitle": "Add a delete asset capability to the frontend. In the Admin Dashboard (AdminDashboard.tsx), add a 'Delete' action for each asset record — accessible from the asset detail drawer and/or the asset table row. Clicking Delete shows a confirmation dialog before calling the backend deleteAsset function. On success, the asset list is refreshed and a success toast is shown. On failure, an error toast is shown.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminDashboard.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-15"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

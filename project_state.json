@@ -1,0 +1,214 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 11,
+  "summary": "Mobile app for physical verification of inventory assets across multiple locations. Features GPS capture, mandatory photo upload, asset entry form, auto date/time stamp, Google Sheet backend, admin dashboard view, and offline capability. Built for audit/physical verification purposes.",
+  "architectural_notes": [
+    "Google Sheets used as backend via Google Sheets API or Apps Script",
+    "Offline-first architecture required with local storage and background sync",
+    "Mobile app must capture GPS coordinates and photos per asset entry"
+  ],
+  "known_issues": [
+    "GPS capture not working for new asset entries in Version 4"
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-create-an-asset-entry-form-that-captures-asset-id-name-asset-category-location-selectable-from-a-list-of-multiple-locations-condition-good-fair-poor-missing-and-free-text-remarks-notes-fields",
+      "title": "Create an asset entry form that captures: Asset ID/Name, Asset Category, Location (selectable from a list of multiple locations), Condition (Good/Fair/Poor/Missing), and free-text Remarks/Notes fields.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-automatically-capture-and-attach-the-current-date-and-time-to-every-asset-submission-upon-form-completion-display-the-timestamp-prominently-on-each-record",
+      "title": "Automatically capture and attach the current date and time to every asset submission upon form completion. Display the timestamp prominently on each record.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-mandatory-photo-upload-for-each-asset-entry-the-user-must-attach-at-least-one-photo-before-the-form-can-be-submitted-support-capturing-a-photo-via-device-camera-or-uploading-from-the-gallery",
+      "title": "Implement mandatory photo upload for each asset entry. The user must attach at least one photo before the form can be submitted. Support capturing a photo via device camera or uploading from the gallery.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-capture-the-device-s-current-gps-coordinates-latitude-and-longitude-when-the-user-submits-an-asset-entry-form-and-attach-the-location-data-to-the-record-display-coordinates-on-the-submission",
+      "title": "Capture the device's current GPS coordinates (latitude and longitude) when the user submits an asset entry form and attach the location data to the record. Display coordinates on the submission.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-an-admin-dashboard-that-displays-all-asset-verification-submissions-in-a-tabular-view-support-filtering-by-location-date-range-and-condition-allow-drilling-into-a-single-record-to-view-full-details-including-the-photo-and-gps-coordinates",
+      "title": "Build an admin dashboard that displays all asset verification submissions in a tabular view. Support filtering by location, date range, and condition. Allow drilling into a single record to view full details including the photo and GPS coordinates.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-offline-capability-so-auditors-can-fill-out-and-queue-asset-entry-forms-without-an-internet-connection-when-connectivity-is-restored-queued-submissions-are-automatically-synced-to-the-backend",
+      "title": "Implement offline capability so auditors can fill out and queue asset entry forms without an internet connection. When connectivity is restored, queued submissions are automatically synced to the backend.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-design-a-mobile-first-visual-theme-for-the-app-industrial-field-audit-aesthetic-with-a-clean-high-contrast-layout-using-deep-slate-and-amber-accent-colors-bold-typography-large-touch-targets-and-card-based-layouts-optimized-for-outdoor-bright-light-use-on-mobile-devices",
+      "title": "Design a mobile-first visual theme for the app: industrial/field-audit aesthetic with a clean, high-contrast layout using deep slate and amber accent colors, bold typography, large touch targets, and card-based layouts optimized for outdoor/bright-light use on mobile devices.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-a-dismissible-add-to-home-screen-banner-or-modal-prompt-to-mobile-users-when-they-first-open-the-app-guiding-them-to-install-it-as-a-pwa-the-prompt-should-appear-automatically-on-first-visit-on-a-mobile-browser-include-step-by-step-instructions-for-both-android-chrome-and-ios-safari-and-not-appear-again-after-the-user-dismisses-it-persist-dismissal-in-localstorage",
+      "title": "Display a dismissible 'Add to Home Screen' banner or modal prompt to mobile users when they first open the app, guiding them to install it as a PWA. The prompt should appear automatically on first visit on a mobile browser, include step-by-step instructions for both Android (Chrome) and iOS (Safari), and not appear again after the user dismisses it (persist dismissal in localStorage).",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-predefined-location-dropdown-select-in-the-asset-entry-form-with-a-blank-free-text-input-field-allowing-users-to-manually-type-any-location-value-the-field-should-start-empty-with-no-pre-selected-or-default-value-update-the-location-filter-in-the-admin-dashboard-to-also-accept-free-text-input-to-match-manually-entered-location-values",
+      "title": "Replace the predefined location dropdown/select in the asset entry form with a blank free-text input field, allowing users to manually type any location value. The field should start empty with no pre-selected or default value. Update the location filter in the admin dashboard to also accept free-text input to match manually entered location values.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-export-to-csv-button-in-the-admin-dashboard-page-when-clicked-it-fetches-all-currently-filtered-asset-records-and-downloads-them-as-a-csv-file-that-is-directly-openable-in-google-sheets-the-csv-must-include-columns-asset-id-asset-name-category-location-condition-remarks-gps-latitude-gps-longitude-photo-reference-and-timestamp-the-downloaded-filename-should-follow-the-pattern-asset-records-yyyy-mm-dd-csv",
+      "title": "Add an 'Export to CSV' button in the Admin Dashboard page. When clicked, it fetches all currently filtered asset records and downloads them as a CSV file that is directly openable in Google Sheets. The CSV must include columns: Asset ID, Asset Name, Category, Location, Condition, Remarks, GPS Latitude, GPS Longitude, Photo Reference, and Timestamp. The downloaded filename should follow the pattern 'asset-records-YYYY-MM-DD.csv'.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-gps-capture-bug-in-the-asset-entry-form-assetentryform-tsx-so-that-latitude-longitude-and-accuracy-are-correctly-captured-and-attached-to-new-asset-submissions-the-usegeolocation-hook-s-capture-callback-must-be-invoked-at-the-right-lifecycle-point-its-state-must-be-read-after-the-async-capture-resolves-and-the-resulting-coordinates-must-be-included-in-the-submission-payload-sent-to-the-backend",
+      "title": "Fix the GPS capture bug in the asset entry form (AssetEntryForm.tsx) so that latitude, longitude, and accuracy are correctly captured and attached to new asset submissions. The useGeolocation hook's `capture` callback must be invoked at the right lifecycle point, its state must be read after the async capture resolves, and the resulting coordinates must be included in the submission payload sent to the backend.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-delete-asset-capability-to-the-frontend-in-the-admin-dashboard-admindashboard-tsx-add-a-delete-action-for-each-asset-record-accessible-from-the-asset-detail-drawer-and-or-the-asset-table-row-clicking-delete-shows-a-confirmation-dialog-before-calling-the-backend-deleteasset-function-on-success-the-asset-list-is-refreshed-and-a-success-toast-is-shown-on-failure-an-error-toast-is-shown",
+      "title": "Add a delete asset capability to the frontend. In the Admin Dashboard (AdminDashboard.tsx), add a 'Delete' action for each asset record — accessible from the asset detail drawer and/or the asset table row. Clicking Delete shows a confirmation dialog before calling the backend deleteAsset function. On success, the asset list is refreshed and a success toast is shown. On failure, an error toast is shown.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "GPS capture during asset verification",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Mandatory photo upload for each asset entry",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Asset entry form for recording inventory details",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Auto date/time stamp on each submission",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Google Sheet as backend data store",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Admin dashboard view to review submissions",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Offline capability with sync when back online",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Multi-location support for asset verification across sites",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Store all asset verification submissions persistently in the backend. Each record must include: Asset ID, Asset Name, Category, Location, Condition, Remarks, GPS coordinates, photo reference, and timestamp.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Add 'Add to Home Screen' prompt/guidance for mobile users to install the app as a PWA",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Location dropdown should be blank by default, allowing users to manually type/add a location instead of selecting from a predefined list",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add a section/feature to download asset records to Google Sheet (export functionality)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Add a backend query function that returns all asset verification records as a structured list suitable for export, including all fields: Asset ID, Asset Name, Category, Location, Condition, Remarks, GPS coordinates (latitude and longitude), photo reference, and timestamp.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Add delete asset functionality to remove asset records",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Add a `deleteAsset` function to the backend Motoko actor (backend/main.mo) that accepts an asset record ID and removes the corresponding entry from the in-memory map. The function must return a success/failure variant indicating whether the record was found and deleted.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Inventory Asset Verification",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

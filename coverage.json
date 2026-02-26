@@ -1,0 +1,65 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-26T20:38:22.182Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 3,
+    "implemented": 2,
+    "items": [
+      {
+        "id": "REQ-13",
+        "summary": "Fix the GPS capture bug in the asset entry form (AssetEntryForm.tsx) so that latitude, longitude, and accuracy are correctly captured and attached to new asset submissions. The useGeolocation hook's `capture` callback must be invoked at the right lifecycle point, its state must be read after the async capture resolves, and the resulting coordinates must be included in the submission payload sent to the backend.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AssetEntryForm.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AssetEntryForm.tsx"
+        ]
+      },
+      {
+        "id": "REQ-14",
+        "summary": "Add a `deleteAsset` function to the backend Motoko actor (backend/main.mo) that accepts an asset record ID and removes the corresponding entry from the in-memory map. The function must return a success/failure variant indicating whether the record was found and deleted.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-15",
+        "summary": "Add a delete asset capability to the frontend. In the Admin Dashboard (AdminDashboard.tsx), add a 'Delete' action for each asset record — accessible from the asset detail drawer and/or the asset table row. Clicking Delete shows a confirmation dialog before calling the backend deleteAsset function. On success, the asset list is refreshed and a success toast is shown. On failure, an error toast is shown.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/AdminDashboard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/AdminDashboard.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/AssetEntryForm.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useGeolocation.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/AdminDashboard.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

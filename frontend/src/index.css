@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Deep slate + amber industrial theme */
+    --background: 0.18 0.012 250;
+    --foreground: 0.95 0.01 250;
+
+    --card: 0.22 0.014 250;
+    --card-foreground: 0.95 0.01 250;
+
+    --popover: 0.25 0.016 250;
+    --popover-foreground: 0.95 0.01 250;
+
+    /* Amber primary */
+    --primary: 0.72 0.18 65;
+    --primary-foreground: 0.12 0.01 250;
+
+    --secondary: 0.28 0.018 250;
+    --secondary-foreground: 0.9 0.01 250;
+
+    --muted: 0.26 0.016 250;
+    --muted-foreground: 0.62 0.02 250;
+
+    --accent: 0.72 0.18 65;
+    --accent-foreground: 0.12 0.01 250;
+
+    --destructive: 0.58 0.22 25;
+    --destructive-foreground: 0.98 0 0;
+
+    --border: 0.32 0.02 250;
+    --input: 0.28 0.018 250;
+    --ring: 0.72 0.18 65;
+
+    --chart-1: 0.72 0.18 65;
+    --chart-2: 0.65 0.15 200;
+    --chart-3: 0.55 0.18 145;
+    --chart-4: 0.62 0.2 300;
+    --chart-5: 0.58 0.22 25;
+
+    --sidebar: 0.16 0.01 250;
+    --sidebar-foreground: 0.95 0.01 250;
+    --sidebar-primary: 0.72 0.18 65;
+    --sidebar-primary-foreground: 0.12 0.01 250;
+    --sidebar-accent: 0.24 0.016 250;
+    --sidebar-accent-foreground: 0.9 0.01 250;
+    --sidebar-border: 0.28 0.018 250;
+    --sidebar-ring: 0.72 0.18 65;
+
+    /* Status colors */
+    --success: 0.62 0.18 145;
+    --warning: 0.72 0.18 65;
+    --info: 0.62 0.15 220;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Large touch targets for mobile */
+  button, [role="button"], input, select, textarea, a {
+    min-height: 44px;
+  }
+
+  input[type="checkbox"], input[type="radio"] {
+    min-height: unset;
+  }
+
+  /* High contrast for outdoor use */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: oklch(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(var(--border));
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(var(--muted-foreground) / 0.5);
+  }
+}
+
+@layer components {
+  .field-card {
+    @apply bg-card rounded-lg border border-border p-4;
+  }
+
+  .form-label {
+    @apply text-sm font-semibold text-foreground uppercase tracking-wider;
+  }
+
+  .status-good {
+    @apply bg-green-900/30 text-green-400 border border-green-700/50;
+  }
+  .status-fair {
+    @apply bg-yellow-900/30 text-yellow-400 border border-yellow-700/50;
+  }
+  .status-poor {
+    @apply bg-red-900/30 text-red-400 border border-red-700/50;
+  }
+  .status-missing {
+    @apply bg-gray-900/30 text-gray-400 border border-gray-700/50;
+  }
+}

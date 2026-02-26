@@ -1,0 +1,49 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix GPS capture bug and add delete asset functionality",
+  "requirements": [
+    {
+      "id": "REQ-13",
+      "summary": "Fix the GPS capture bug in AssetEntryForm.tsx so that latitude, longitude, and accuracy are correctly captured and included in asset submissions",
+      "acceptanceCriteria": [
+        "Pressing the GPS capture button in the asset entry form triggers the browser Geolocation API and populates latitude, longitude, and accuracy fields.",
+        "The captured GPS coordinates are visible in the form UI before submission.",
+        "On form submission, the GPS coordinates are included in the record stored in the backend.",
+        "The submitted asset record, when viewed in the admin dashboard detail drawer, displays the correct GPS coordinates.",
+        "If geolocation is denied or unavailable, a clear error message is shown to the user and submission is not silently broken."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AssetEntryForm.tsx",
+          "operation": "modify",
+          "description": "Fix the GPS capture workflow by ensuring the useGeolocation hook's `capture` callback is invoked at the correct lifecycle point, reading the geolocation state after the async capture resolves, and including the resulting latitude, longitude, and accuracy in the submission payload sent to submitAssetCheck. Add proper error handling to display geolocation errors to the user and prevent silent submission failures when GPS capture fails or is denied."
+        }
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "summary": "Add delete asset capability to the frontend Admin Dashboard with confirmation dialog and success/error feedback",
+      "acceptanceCriteria": [
+        "A Delete button is visible for each asset record in the admin dashboard (in the detail drawer or table row, or both).",
+        "Clicking Delete shows a confirmation dialog asking the user to confirm before proceeding.",
+        "Confirming deletion calls the backend deleteAsset function and removes the record from the displayed list upon success.",
+        "A success toast notification is shown after a record is successfully deleted.",
+        "An error toast notification is shown if deletion fails.",
+        "The useQueries.ts hook includes a `useDeleteAsset` mutation that calls the backend deleteAsset function and invalidates the asset list query on success."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a `useDeleteAsset` mutation hook that accepts an assetId, calls the backend deleteAsset function, and invalidates the asset list queries on success to trigger automatic UI refresh. Handle both success and assetNotFound error cases from the DeleteResult enum defined in backend.d.ts."
+        },
+        {
+          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "operation": "modify",
+          "description": "Add a Delete button in the asset detail drawer that opens a confirmation dialog (using shadcn/ui AlertDialog component) before calling the useDeleteAsset mutation. On successful deletion, close the drawer, show a success toast, and let the invalidated query refresh the asset list. On failure, show an error toast with the failure reason. Ensure the Delete button is visually distinct and placed near other action controls in the drawer footer or header."
+        }
+      ]
+    }
+  ]
+}
