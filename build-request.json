@@ -1,80 +1,60 @@
 {
   "kind": "build_request",
-  "title": "Fix GPS capture bug and add delete asset functionality",
+  "title": "Fix GPS capture and camera/photo button in AssetEntryForm",
   "projectName": "AssetVerify",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-13",
-      "text": "Fix the GPS capture bug in the asset entry form (AssetEntryForm.tsx) so that latitude, longitude, and accuracy are correctly captured and attached to new asset submissions. The useGeolocation hook's `capture` callback must be invoked at the right lifecycle point, its state must be read after the async capture resolves, and the resulting coordinates must be included in the submission payload sent to the backend.",
+      "id": "REQ-16",
+      "text": "Fix the camera/photo capture button in AssetEntryForm.tsx so that tapping 'Take Photo' or 'Upload from Gallery' correctly opens the device camera or file picker on mobile devices. The PhotoUpload component's file input must have the correct `accept` and `capture` attributes, and any event handler wiring issues preventing the button from triggering the input must be resolved.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-8"
         ],
         "quotes": [
-          "GPS in not working for new asset in this version...pls correct error"
+          "camera button is not working pls correct error"
         ]
       },
       "acceptanceCriteria": [
-        "Pressing the GPS capture button in the asset entry form triggers the browser Geolocation API and populates latitude, longitude, and accuracy fields.",
-        "The captured GPS coordinates are visible in the form UI before submission.",
-        "On form submission, the GPS coordinates are included in the record stored in the backend.",
-        "The submitted asset record, when viewed in the admin dashboard detail drawer, displays the correct GPS coordinates.",
-        "If geolocation is denied or unavailable, a clear error message is shown to the user and submission is not silently broken."
+        "Tapping the camera button on a mobile device opens the device camera to capture a photo.",
+        "Tapping the gallery/upload button opens the device file picker to select an image.",
+        "Selected or captured photos appear in the photo preview grid within AssetEntryForm.",
+        "The form cannot be submitted without at least one photo attached (existing validation preserved).",
+        "No JavaScript errors are thrown when interacting with the photo capture/upload controls."
       ]
     },
     {
-      "id": "REQ-14",
-      "text": "Add a `deleteAsset` function to the backend Motoko actor (backend/main.mo) that accepts an asset record ID and removes the corresponding entry from the in-memory map. The function must return a success/failure variant indicating whether the record was found and deleted.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "add functon to delete asset"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The backend exposes a `deleteAsset(id: Text) : async Result.Result<(), Text>` (or equivalent) function.",
-        "Calling deleteAsset with a valid existing ID removes the record and returns a success result.",
-        "Calling deleteAsset with a non-existent ID returns an error/not-found result without crashing.",
-        "After deletion, querying all assets no longer returns the deleted record."
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "text": "Add a delete asset capability to the frontend. In the Admin Dashboard (AdminDashboard.tsx), add a 'Delete' action for each asset record — accessible from the asset detail drawer and/or the asset table row. Clicking Delete shows a confirmation dialog before calling the backend deleteAsset function. On success, the asset list is refreshed and a success toast is shown. On failure, an error toast is shown.",
+      "id": "REQ-17",
+      "text": "Fix the GPS capture flow in AssetEntryForm.tsx so that GPS coordinates are reliably obtained on form submission. The `useGeolocation` hook's `capture` function must be called and awaited before building the submission payload, and the resolved latitude, longitude, and accuracy values must be read from the promise result (not from stale React state) and correctly included in the asset record sent to the backend.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-8"
         ],
         "quotes": [
-          "add functon to delete asset"
+          "GPS and camera button is not working pls correct error"
         ]
       },
       "acceptanceCriteria": [
-        "A Delete button is visible for each asset record in the admin dashboard (in the detail drawer or table row, or both).",
-        "Clicking Delete shows a confirmation dialog asking the user to confirm before proceeding.",
-        "Confirming deletion calls the backend deleteAsset function and removes the record from the displayed list upon success.",
-        "A success toast notification is shown after a record is successfully deleted.",
-        "An error toast notification is shown if deletion fails.",
-        "The useQueries.ts hook includes a `useDeleteAsset` mutation that calls the backend deleteAsset function and invalidates the asset list query on success."
+        "On form submission, the browser prompts the user for location permission if not already granted.",
+        "After permission is granted, GPS coordinates (latitude and longitude) are captured and attached to the submission payload.",
+        "The submitted asset record stored in the backend contains non-null, accurate GPS latitude and longitude values.",
+        "GPS coordinates are displayed on the submission confirmation and in the Admin Dashboard detail view.",
+        "If GPS capture fails (e.g., permission denied), a clear error message is shown to the user and submission is blocked or proceeds with a graceful fallback, consistent with existing UX."
       ]
     }
   ],
   "constraints": [
     "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "All backend logic must remain in the single actor in backend/main.mo.",
-    "GPS fix must not change the public interface of the useGeolocation hook — only correct its usage in AssetEntryForm.tsx."
+    "Do not alter the backend data model or Motoko actor unless strictly required to fix the GPS/photo issues.",
+    "Preserve all existing form validation logic (mandatory photo, required fields)."
   ],
   "nonGoals": [
-    "Bulk delete of multiple assets at once.",
-    "Soft-delete or archive functionality — records should be permanently removed.",
-    "Changes to the CSV export format or offline queue logic.",
-    "Any changes to the mobile PWA prompt or Add to Home Screen feature."
+    "Adding new form fields or changing the asset data schema.",
+    "Redesigning the visual theme or layout.",
+    "Changes to the Admin Dashboard beyond what is needed to display correctly captured GPS data.",
+    "Offline queue logic changes."
   ],
   "imageRequirements": {
     "required": [],

@@ -1,47 +1,51 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix GPS capture bug and add delete asset functionality",
+  "title": "Fix GPS capture and camera/photo button in AssetEntryForm",
   "requirements": [
     {
-      "id": "REQ-13",
-      "summary": "Fix the GPS capture bug in AssetEntryForm.tsx so that latitude, longitude, and accuracy are correctly captured and included in asset submissions",
+      "id": "REQ-16",
+      "summary": "Fix the camera/photo capture button in AssetEntryForm.tsx so that tapping 'Take Photo' or 'Upload from Gallery' correctly opens the device camera or file picker on mobile devices",
       "acceptanceCriteria": [
-        "Pressing the GPS capture button in the asset entry form triggers the browser Geolocation API and populates latitude, longitude, and accuracy fields.",
-        "The captured GPS coordinates are visible in the form UI before submission.",
-        "On form submission, the GPS coordinates are included in the record stored in the backend.",
-        "The submitted asset record, when viewed in the admin dashboard detail drawer, displays the correct GPS coordinates.",
-        "If geolocation is denied or unavailable, a clear error message is shown to the user and submission is not silently broken."
+        "Tapping the camera button on a mobile device opens the device camera to capture a photo.",
+        "Tapping the gallery/upload button opens the device file picker to select an image.",
+        "Selected or captured photos appear in the photo preview grid within AssetEntryForm.",
+        "The form cannot be submitted without at least one photo attached (existing validation preserved).",
+        "No JavaScript errors are thrown when interacting with the photo capture/upload controls."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/PhotoUpload.tsx",
+          "operation": "modify",
+          "description": "Fix the file input's accept and capture attributes to ensure proper camera and gallery access on mobile devices. Verify that the file input element has accept='image/*' and capture='environment' for the camera mode. Ensure the hidden file input ref is correctly wired to the onClick handlers of both 'Take Photo' and 'Upload from Gallery' buttons. Add proper event handler wiring to trigger input.click() when buttons are tapped. Test that the onChange event correctly processes selected files and triggers the image compression and preview update flow."
+        },
+        {
+          "path": "frontend/src/components/AssetEntryForm.tsx",
+          "operation": "modify",
+          "description": "Verify that the PhotoUpload component is correctly integrated and that photo state updates propagate properly. Ensure the existing photo validation logic (requiring at least one photo before submission) remains intact. Confirm that the photos array state is correctly passed to PhotoUpload and that updates from PhotoUpload are reflected in the form's submission payload."
+        }
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "summary": "Fix the GPS capture flow in AssetEntryForm.tsx so that GPS coordinates are reliably obtained on form submission by calling and awaiting the useGeolocation hook's capture function before building the submission payload",
+      "acceptanceCriteria": [
+        "On form submission, the browser prompts the user for location permission if not already granted.",
+        "After permission is granted, GPS coordinates (latitude and longitude) are captured and attached to the submission payload.",
+        "The submitted asset record stored in the backend contains non-null, accurate GPS latitude and longitude values.",
+        "GPS coordinates are displayed on the submission confirmation and in the Admin Dashboard detail view.",
+        "If GPS capture fails (e.g., permission denied), a clear error message is shown to the user and submission is blocked or proceeds with a graceful fallback, consistent with existing UX."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AssetEntryForm.tsx",
           "operation": "modify",
-          "description": "Fix the GPS capture workflow by ensuring the useGeolocation hook's `capture` callback is invoked at the correct lifecycle point, reading the geolocation state after the async capture resolves, and including the resulting latitude, longitude, and accuracy in the submission payload sent to submitAssetCheck. Add proper error handling to display geolocation errors to the user and prevent silent submission failures when GPS capture fails or is denied."
-        }
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "summary": "Add delete asset capability to the frontend Admin Dashboard with confirmation dialog and success/error feedback",
-      "acceptanceCriteria": [
-        "A Delete button is visible for each asset record in the admin dashboard (in the detail drawer or table row, or both).",
-        "Clicking Delete shows a confirmation dialog asking the user to confirm before proceeding.",
-        "Confirming deletion calls the backend deleteAsset function and removes the record from the displayed list upon success.",
-        "A success toast notification is shown after a record is successfully deleted.",
-        "An error toast notification is shown if deletion fails.",
-        "The useQueries.ts hook includes a `useDeleteAsset` mutation that calls the backend deleteAsset function and invalidates the asset list query on success."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add a `useDeleteAsset` mutation hook that accepts an assetId, calls the backend deleteAsset function, and invalidates the asset list queries on success to trigger automatic UI refresh. Handle both success and assetNotFound error cases from the DeleteResult enum defined in backend.d.ts."
+          "description": "Refactor the form submission handler to call and await the useGeolocation hook's capture() function before constructing the submission payload. Read the resolved GPS coordinates (latitude, longitude, accuracy) directly from the promise result returned by capture(), not from React state. Use the fresh coordinates from the promise to populate the backend payload latitude and longitude fields. Add proper error handling to catch GPS capture failures and display a user-friendly error message using toast. Ensure the submission is blocked if GPS capture fails or provide a graceful fallback consistent with existing UX patterns. Preserve all existing form validation logic including the mandatory photo requirement."
         },
         {
-          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "path": "frontend/src/hooks/useGeolocation.ts",
           "operation": "modify",
-          "description": "Add a Delete button in the asset detail drawer that opens a confirmation dialog (using shadcn/ui AlertDialog component) before calling the useDeleteAsset mutation. On successful deletion, close the drawer, show a success toast, and let the invalidated query refresh the asset list. On failure, show an error toast with the failure reason. Ensure the Delete button is visually distinct and placed near other action controls in the drawer footer or header."
+          "description": "Review the capture function implementation to ensure it returns a properly typed promise containing latitude, longitude, and accuracy. Verify that the Geolocation API call is wrapped correctly and that the promise resolves with fresh coordinate data. Ensure error handling propagates failures (e.g., permission denied, timeout) back to the caller so AssetEntryForm can handle them appropriately."
         }
       ]
     }

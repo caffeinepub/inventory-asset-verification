@@ -1,13 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the GPS capture bug in the asset entry form and add delete asset functionality to both the backend and admin dashboard.
+**Goal:** Fix the GPS capture and camera/photo button functionality in the AssetEntryForm so both work correctly on mobile devices.
 
 **Planned changes:**
-- Fix GPS capture in `AssetEntryForm.tsx` so the `useGeolocation` hook's `capture` callback is invoked correctly, coordinates are displayed in the form before submission, and included in the submission payload sent to the backend; show a clear error if geolocation is denied or unavailable
-- Add a `deleteAsset(id: Text)` function to the backend Motoko actor (`backend/main.mo`) that removes the record from the in-memory map and returns a success/failure result
-- Add a Delete button for each asset in the Admin Dashboard (detail drawer and/or table row) with a confirmation dialog before calling the backend delete function
-- Add a `useDeleteAsset` mutation in `useQueries.ts` that calls the backend `deleteAsset` function and invalidates the asset list query on success
-- Show a success toast on successful deletion and an error toast on failure, then refresh the asset list
+- Fix the `PhotoUpload` component's file input so that `accept` and `capture` attributes are correctly set, and the "Take Photo" / "Upload from Gallery" buttons properly trigger the file input on mobile devices.
+- Fix the GPS capture flow in `AssetEntryForm.tsx` so that the `useGeolocation` hook's `capture` function is called and awaited on form submission, and the resolved coordinates are read from the promise result (not stale state) before building the submission payload.
+- Ensure GPS latitude, longitude, and accuracy are correctly included in the asset record sent to the backend.
+- Show a clear error message to the user if GPS capture fails, blocking or gracefully handling submission.
 
-**User-visible outcome:** GPS coordinates are correctly captured and saved when adding a new asset, and admins can delete individual asset records from the dashboard with a confirmation prompt and toast feedback.
+**User-visible outcome:** On mobile, tapping the camera button opens the device camera and tapping the gallery button opens the file picker. On form submission, the user is prompted for location permission, and the captured GPS coordinates are stored with the asset record and displayed in the confirmation and Admin Dashboard detail view.

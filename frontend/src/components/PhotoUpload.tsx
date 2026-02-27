@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Camera, X, ImagePlus, AlertCircle } from 'lucide-react';
+import { Camera, X, ImagePlus, AlertCircle, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { compressImage } from '../utils/imageCompression';
 
@@ -11,13 +11,13 @@ interface PhotoUploadProps {
 }
 
 export function PhotoUpload({ photos, onChange, error, maxPhotos = 5 }: PhotoUploadProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Two separate refs: one for camera capture, one for gallery/file picker
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+  const processFiles = async (files: File[]) => {
     if (files.length === 0) return;
-
     setIsProcessing(true);
     try {
       const remaining = maxPhotos - photos.length;
@@ -28,7 +28,35 @@ export function PhotoUpload({ photos, onChange, error, maxPhotos = 5 }: PhotoUpl
       console.error('Failed to process image:', err);
     } finally {
       setIsProcessing(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      // Reset both inputs so the same file can be selected again
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
+      if (galleryInputRef.current) galleryInputRef.current.value = '';
+    }
+  };
+
+  const handleCameraChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    await processFiles(files);
+  };
+
+  const handleGalleryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    await processFiles(files);
+  };
+
+  const handleCameraClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (cameraInputRef.current) {
+      cameraInputRef.current.click();
+    }
+  };
+
+  const handleGalleryClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (galleryInputRef.current) {
+      galleryInputRef.current.click();
     }
   };
 
@@ -36,8 +64,33 @@ export function PhotoUpload({ photos, onChange, error, maxPhotos = 5 }: PhotoUpl
     onChange(photos.filter((_, i) => i !== index));
   };
 
+  const canAddMore = photos.length < maxPhotos;
+
   return (
     <div className="space-y-3">
+      {/* Hidden camera input — capture="environment" forces rear camera on mobile */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleCameraChange}
+        className="hidden"
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+      {/* Hidden gallery input — no capture attribute so OS shows file picker / gallery */}
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleGalleryChange}
+        className="hidden"
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+
       {/* Photo grid */}
       {photos.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
@@ -51,8 +104,7 @@ export function PhotoUpload({ photos, onChange, error, maxPhotos = 5 }: PhotoUpl
               <button
                 type="button"
                 onClick={() => removePhoto(index)}
-                className="absolute top-1 right-1 bg-destructive/90 text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity touch-manipulation"
-                style={{ minHeight: 'unset' }}
+                className="absolute top-1 right-1 bg-destructive/90 text-destructive-foreground rounded-full p-1 opacity-80 group-hover:opacity-100 transition-opacity touch-manipulation"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -64,58 +116,69 @@ export function PhotoUpload({ photos, onChange, error, maxPhotos = 5 }: PhotoUpl
         </div>
       )}
 
-      {/* Upload button */}
-      {photos.length < maxPhotos && (
-        <div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            multiple
-            onChange={handleFileChange}
-            className="hidden"
-            id="photo-upload"
-          />
-          <label
-            htmlFor="photo-upload"
-            className={`
-              flex flex-col items-center justify-center gap-2 w-full
-              min-h-[120px] rounded-lg border-2 border-dashed cursor-pointer
-              transition-colors touch-manipulation
-              ${error
-                ? 'border-destructive/60 bg-destructive/5 hover:bg-destructive/10'
-                : 'border-border hover:border-primary/60 bg-secondary/30 hover:bg-secondary/50'
-              }
-              ${isProcessing ? 'opacity-50 pointer-events-none' : ''}
-            `}
-          >
-            {isProcessing ? (
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm text-muted-foreground">Processing...</span>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center gap-2">
-                  <Camera className="w-6 h-6 text-primary" />
-                  <ImagePlus className="w-5 h-5 text-muted-foreground" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-semibold text-foreground">
-                    {photos.length === 0 ? 'Add Photo (Required)' : 'Add More Photos'}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Tap to use camera or choose from gallery
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {photos.length}/{maxPhotos} photos
-                  </p>
-                </div>
-              </>
-            )}
-          </label>
+      {/* Upload buttons */}
+      {canAddMore && (
+        <div className="space-y-2">
+          {isProcessing ? (
+            <div className="flex flex-col items-center justify-center gap-2 w-full min-h-[80px] rounded-lg border-2 border-dashed border-border bg-secondary/30">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <span className="text-sm text-muted-foreground">Processing photo...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              {/* Camera button */}
+              <button
+                type="button"
+                onClick={handleCameraClick}
+                className={`
+                  flex flex-col items-center justify-center gap-2
+                  min-h-[80px] rounded-lg border-2 cursor-pointer
+                  transition-colors touch-manipulation select-none
+                  active:scale-95
+                  ${error
+                    ? 'border-destructive/60 bg-destructive/5 hover:bg-destructive/10'
+                    : 'border-border hover:border-primary/60 bg-secondary/30 hover:bg-secondary/50'
+                  }
+                `}
+              >
+                <Camera className="w-6 h-6 text-primary" />
+                <span className="text-xs font-semibold text-foreground">Take Photo</span>
+              </button>
+
+              {/* Gallery button */}
+              <button
+                type="button"
+                onClick={handleGalleryClick}
+                className={`
+                  flex flex-col items-center justify-center gap-2
+                  min-h-[80px] rounded-lg border-2 cursor-pointer
+                  transition-colors touch-manipulation select-none
+                  active:scale-95
+                  ${error
+                    ? 'border-destructive/60 bg-destructive/5 hover:bg-destructive/10'
+                    : 'border-border hover:border-primary/60 bg-secondary/30 hover:bg-secondary/50'
+                  }
+                `}
+              >
+                <FolderOpen className="w-6 h-6 text-muted-foreground" />
+                <span className="text-xs font-semibold text-foreground">Upload from Gallery</span>
+              </button>
+            </div>
+          )}
+
+          <p className="text-xs text-muted-foreground text-center">
+            {photos.length === 0
+              ? <span className="text-destructive font-medium">At least 1 photo required</span>
+              : `${photos.length}/${maxPhotos} photos added`
+            }
+          </p>
         </div>
+      )}
+
+      {photos.length >= maxPhotos && (
+        <p className="text-xs text-muted-foreground text-center">
+          Maximum {maxPhotos} photos reached
+        </p>
       )}
 
       {/* Error message */}

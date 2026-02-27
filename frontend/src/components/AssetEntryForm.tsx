@@ -60,6 +60,7 @@ export function AssetEntryForm({ onSuccess }: AssetEntryFormProps) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitState, setSubmitState] = useState<'idle' | 'capturing-gps' | 'submitting' | 'success' | 'queued' | 'error'>('idle');
   const [capturedGPS, setCapturedGPS] = useState<{ latitude: number; longitude: number; accuracy?: number } | null>(null);
+  const [isCapturingGPS, setIsCapturingGPS] = useState(false);
 
   const geo = useGeolocation();
   const submitMutation = useSubmitAssetCheck();
@@ -76,6 +77,27 @@ export function AssetEntryForm({ onSuccess }: AssetEntryFormProps) {
     return Object.keys(newErrors).length === 0;
   }, [formData, photos]);
 
+  // Manual GPS capture button handler
+  const handleCaptureGPS = async () => {
+    setIsCapturingGPS(true);
+    setErrors(prev => ({ ...prev, gps: undefined }));
+    try {
+      const coords = await geo.capture();
+      setCapturedGPS({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        accuracy: coords.accuracy ?? undefined,
+      });
+    } catch (err) {
+      setErrors(prev => ({
+        ...prev,
+        gps: err instanceof Error ? err.message : 'Failed to capture GPS location',
+      }));
+    } finally {
+      setIsCapturingGPS(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -87,9 +109,6 @@ export function AssetEntryForm({ onSuccess }: AssetEntryFormProps) {
 
     if (!gps) {
       try {
-        // capture() now returns accuracy directly from the GeolocationPosition
-        // object, so we don't need to read it from React state (which may not
-        // have updated yet due to async batching).
         const coords = await geo.capture();
         gps = {
           latitude: coords.latitude,
@@ -149,6 +168,7 @@ export function AssetEntryForm({ onSuccess }: AssetEntryFormProps) {
     setErrors({});
     setSubmitState('idle');
     setCapturedGPS(null);
+    setIsCapturingGPS(false);
     geo.reset();
   };
 
@@ -352,24 +372,69 @@ export function AssetEntryForm({ onSuccess }: AssetEntryFormProps) {
         />
       </div>
 
-      {/* GPS Status */}
+      {/* GPS Location */}
       <div className="field-card space-y-2">
         <Label className="form-label flex items-center gap-2">
           <Navigation className="w-3.5 h-3.5 text-primary" />
           GPS Location
         </Label>
+
         {capturedGPS ? (
-          <GPSDisplay
-            latitude={capturedGPS.latitude}
-            longitude={capturedGPS.longitude}
-            accuracy={capturedGPS.accuracy}
-          />
+          <div className="space-y-2">
+            <GPSDisplay
+              latitude={capturedGPS.latitude}
+              longitude={capturedGPS.longitude}
+              accuracy={capturedGPS.accuracy}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCaptureGPS}
+              disabled={isCapturingGPS || isSubmitting}
+              className="w-full min-h-[40px] text-xs border-border text-muted-foreground hover:text-foreground"
+            >
+              {isCapturingGPS ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  Updating GPS...
+                </>
+              ) : (
+                <>
+                  <Navigation className="w-3.5 h-3.5 mr-1.5" />
+                  Refresh GPS Location
+                </>
+              )}
+            </Button>
+          </div>
         ) : (
-          <div className="text-sm text-muted-foreground bg-secondary/30 rounded-lg px-3 py-2.5 flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-            <span>GPS will be captured automatically on submission</span>
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground bg-secondary/30 rounded-lg px-3 py-2.5 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
+              <span>GPS will be captured automatically on submission, or tap below to capture now.</span>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCaptureGPS}
+              disabled={isCapturingGPS || isSubmitting}
+              className="w-full min-h-[44px] border-primary/40 text-primary hover:bg-primary/10 hover:border-primary touch-manipulation"
+            >
+              {isCapturingGPS ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Capturing GPS...
+                </>
+              ) : (
+                <>
+                  <Navigation className="w-4 h-4 mr-2" />
+                  Capture GPS Location Now
+                </>
+              )}
+            </Button>
           </div>
         )}
+
         {errors.gps && (
           <div className="flex items-start gap-2 text-destructive text-sm bg-destructive/10 rounded-lg p-3">
             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
